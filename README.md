@@ -1,2 +1,2 @@
 # ML-AI_Workshop-2025
-This is a repository for the backend necessary
+This is a repository for the necessary frontend
