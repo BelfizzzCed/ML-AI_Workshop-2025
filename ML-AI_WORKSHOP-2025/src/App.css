@@ -1,42 +1,40 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('./fonts/AmazonEmber.ttf') format('ttf');
+  font-weight: 400;
+  font-style: bold;
 }
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('./fonts/AmazonEmberBdlt.ttf') format('ttf');
+  font-weight: 400;
+  font-style: bold, italic;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('./fonts/AmazonEmberLt.ttf') format('ttf');
+  font-weight: 400;
+  font-style: light;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('./fonts/AmazonEmberRg.ttf') format('ttf');
+  font-weight: 400;
+  font-style: normal;
 }
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('./fonts/AmazonEmberLtIt.ttf') format('ttf');
+  font-weight: 400;
+  font-style: light, italic;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+@font-face {
+  font-family: 'Amazon Ember';
+  src: url('./fonts/AmazonEmberRgIt.ttf') format('ttf');
+  font-weight: 700;
+  font-style: italic;
 }
-
-.card {
-  padding: 2em;
+@theme {
+  --font-amazon-ember: "Amazon Ember", sans-serif;
 }
-
-.read-the-docs {
-  color: #888;
-}
+@import "tailwindcss";
