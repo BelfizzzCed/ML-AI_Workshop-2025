@@ -19,7 +19,7 @@ function App() {
           </button>
         </div>
         <button className="bg-purple-300 hover:bg-purple-400 font-amazon-ember text-white font-semibold py-2 px-8 rounded-full flex items-center gap-2">
-          {/* Shield icon */}
+          {/* Shield icon! */}
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2l4-4m5 2a9 9 0 11-18 0a9 9 0 0118 0z" />
           </svg>
