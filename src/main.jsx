@@ -1,3 +1,5 @@
+//DO NOT EDIT ANYTHING IN THIS FILE; it is used to render and run App.jsx 
+
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './App.css'
