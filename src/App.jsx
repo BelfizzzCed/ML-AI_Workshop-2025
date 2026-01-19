@@ -1,108 +1,246 @@
-import React, { useState, useEffect, useRef } from 'react';
+import './App.css';
+import { useState, useRef, useEffect } from 'react';
+import * as uuid from 'uuid';
+import placeholderImg from './asset/placeholder.png';
 
 function App() {
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
-  // State to track whether the camera is currently turned on (true) or off (false)
-  const [cameraOn, setCameraOn] = useState(false);
+  const [image, setImage] = useState(null);
+  const [uploadResultMessage, setUploadResultMessage] = useState(
+    'Please upload an image to authenticate.'
+  );
+  const [imgSrc, setImgSrc] = useState(placeholderImg);
+  const [isAuth, setIsAuth] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
 
-  // State to store any error messages, e.g., if camera permission is denied
-  const [error, setError] = useState(null);
-
+  // Initialize camera when cameraActive becomes true
   useEffect(() => {
-    if (cameraOn) {
-      // When camera is turned on, clear any previous error
-      setError(null);
+    let stream = null;
 
-      // Ask browser for camera access
-      navigator.mediaDevices
-        .getUserMedia({ video: true }) // request video stream only
-        .then((stream) => {
-          // If videoRef is connected to a video element, assign the camera stream to it
+    async function setupCamera() {
+      if (cameraActive && videoRef.current) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user' },
+            audio: false,
+          });
+
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
           }
-        })
-        .catch((err) => {
-          // If there's an error (e.g., user denies permission), show error and turn off camera
-          console.error("Error accessing the camera: ", err);
-          setError("Failed to access camera. Please ensure permissions are granted.");
-          setCameraOn(false);
-        });
-    } else {
-      // When camera is turned off, stop all active tracks to free the device
-      const currentStream = videoRef.current?.srcObject;
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
+        } catch (err) {
+          console.error('Error accessing camera:', err);
+          setCameraActive(false);
+        }
       }
     }
 
-    // Cleanup: stop the camera if component is unmounted
+    setupCamera();
+
+    // Cleanup camera
     return () => {
-      const currentStream = videoRef.current?.srcObject;
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [cameraOn]);
+  }, [cameraActive]);
 
-  // Function to toggle camera state between on and off
-  const handleCameraToggle = () => {
-    setCameraOn(prev => !prev);
+  // Capture photo from camera
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+
+      setImgSrc(placeholderImg);
+      setIsAuth(false);
+      setUploadResultMessage('Please authenticate with your new photo.');
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const aspectRatio = video.videoWidth / video.videoHeight;
+
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const file = new File([blob], 'camera-photo.jpeg', {
+                type: 'image/jpeg',
+              });
+              setImage(file);
+
+              const imageUrl = URL.createObjectURL(file);
+              setImgSrc(imageUrl);
+
+              const imgElement = document.querySelector('.preview-image');
+              if (imgElement) {
+                imgElement.dataset.aspectRatio = aspectRatio.toString();
+              }
+
+              setCameraActive(false);
+            }
+          },
+          'image/jpeg',
+          0.95
+        );
+      }
+    }
   };
 
+  // Toggle camera
+  const toggleCamera = () => {
+    if (!cameraActive) {
+      setImgSrc(placeholderImg);
+      setUploadResultMessage('Please upload an image to authenticate.');
+      setIsAuth(false);
+    }
+    setCameraActive(!cameraActive);
+  };
+
+  const sendImage = async (e) => {
+    e.preventDefault();
+
+    if (!image) {
+      setUploadResultMessage('Please take a photo first.');
+      return;
+    }
+
+    const userImageName = uuid.v4();
+    const imageUrl = URL.createObjectURL(image);
+    setImgSrc(imageUrl);
+
+    try {
+      setUploadResultMessage('Uploading image...');
+      const apiUrl = import.meta.env.VITE_API_GATEWAY_URL;
+      const bucketPath = import.meta.env.VITE_S3_BUCKET_PATH;
+
+      const uploadResponse = await fetch(
+        `${apiUrl}/${bucketPath}/${userImageName}.jpeg`,
+        {
+          method: 'PUT',
+          body: image,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        }
+      );
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed with status: ${uploadResponse.status}`);
+      } else {
+        console.log('Image uploaded at S3');
+      }
+
+      const response = await authenticate(userImageName);
+
+      if (response && response.Message === 'Success') {
+        setIsAuth(true);
+        setUploadResultMessage(
+          `Hi! ${response['firstName']} ${response['lastName']}, you are authenticated successfully!`
+        );
+      } else if (response && response.Message === 'NotFound') {
+        setIsAuth(false);
+        setUploadResultMessage(
+          'Person not found in the system. Please register first.'
+        );
+      } else {
+        setIsAuth(false);
+        setUploadResultMessage(
+          'Sorry, we could not authenticate you. Please try again.'
+        );
+      }
+    } catch (error) {
+      setIsAuth(false);
+      console.error('Error uploading image:', error);
+      setUploadResultMessage('An error occurred. Please try again.');
+    }
+  };
+
+  async function authenticate(userImageName) {
+    try {
+      const apiUrl = import.meta.env.VITE_API_GATEWAY_URL;
+      const requestURL =
+        `${apiUrl}/attendee?` +
+        new URLSearchParams({
+          objectKey: `${userImageName}.jpeg`,
+        });
+
+      const response = await fetch(requestURL, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 403) {
+        console.log('Person not found in the system');
+        return { Message: 'NotFound' };
+      } else if (!response.ok) {
+        throw new Error(
+          `Authentication failed with status: ${response.status}`
+        );
+      } else {
+        console.log('Image authenticated');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error authenticating:', error);
+      return null;
+    }
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12" style={{ background: "linear-gradient(120deg, #f7b2e6 0%, #a0e9ff 100%)" }}>
-      <div className="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 md:p-12 w-full max-w-4xl flex flex-col items-center border-4 border-purple-300">
-        <h1 className="font-sans font-bold text-3xl sm:text-4xl text-center mb-6 text-gray-800">
-          Facial Recognition Attendance System
-        </h1>
+    <div className="App">
+      <h2>Facial Recognition Attendance System</h2>
 
-        {/* Main area showing either the live camera feed or instructions */}
-        <div className="relative rounded-2xl w-full max-w-2xl h-80 sm:h-96 flex items-center justify-center mb-8 bg-gray-100 shadow-inner overflow-hidden border-2 border-gray-300">
-          {error && (
-            <p className="absolute text-red-500 z-10 p-4 bg-white bg-opacity-75 rounded-lg text-center font-semibold">{error}</p>
-          )}
+      <button type="button" onClick={toggleCamera}>
+        {cameraActive ? 'Turn Off Camera' : 'Use Camera'}
+      </button>
 
-          {cameraOn ? (
-            // If camera is ON, show the live video feed
-            <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted></video>
-          ) : (
-            // If camera is OFF, show instructions and "Turn On Camera" button
-            <div className="flex flex-col items-center justify-center p-4 text-center">
-              <p className="font-sans mb-6 text-lg text-gray-600">This application requires a camera to work.</p>
-              {/* Button to turn camera ON */}
-              <button
-                onClick={handleCameraToggle} // Click to toggle camera state to ON
-                className="bg-purple-500 hover:bg-purple-600 focus:outline-none focus:ring-4 focus:ring-purple-300 font-sans text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg"
-              >
-                Turn On Camera
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Buttons below camera feed */}
-        <div className="flex justify-center w-full max-w-md space-x-4">
-          {cameraOn && (
-            // Button to turn camera OFF (only shows if camera is currently ON)
-            <button
-              onClick={handleCameraToggle} // Click to toggle camera state to OFF
-              className="bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-red-300 font-sans text-white font-semibold py-3 px-8 rounded-full flex items-center gap-3 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg"
-            >
-              Turn Off Camera
-            </button>
-          )}
-
-          {/* Authentication button (not tied to camera control) */}
-          <button className="bg-purple-500 hover:bg-purple-600 focus:outline-none focus:ring-4 focus:ring-purple-300 font-sans text-white font-semibold py-3 px-8 rounded-full flex items-center gap-3 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2l4-4m5 2a9 9 0 11-18 0a9 9 0 0118 0z" />
-            </svg>
-            Authenticate
+      {cameraActive && (
+        <div className="camera-container">
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            style={{ width: '100%', maxWidth: '500px' }}
+          />
+          <button type="button" onClick={capturePhoto}>
+            Take Photo
           </button>
         </div>
+      )}
+
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+      <div className="auth-button-container">
+        <button onClick={sendImage} disabled={!image || cameraActive}>
+          Authenticate
+        </button>
       </div>
+
+      <div className={isAuth ? 'success' : 'failure'}>
+        {uploadResultMessage}
+      </div>
+
+      <img
+        src={imgSrc}
+        alt="User"
+        className="preview-image"
+        style={{
+          height: '250px',
+          width: 'auto',
+          maxWidth: '100%',
+          objectFit: 'contain',
+        }}
+      />
     </div>
   );
 }
