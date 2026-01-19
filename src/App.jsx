@@ -1,7 +1,6 @@
 import './App.css';
 import { useState, useRef, useEffect } from 'react';
 import * as uuid from 'uuid';
-import placeholderImg from './asset/placeholder.png';
 
 function App() {
   const videoRef = useRef(null);
@@ -11,7 +10,7 @@ function App() {
   const [uploadResultMessage, setUploadResultMessage] = useState(
     'Please upload an image to authenticate.'
   );
-  const [imgSrc, setImgSrc] = useState(placeholderImg);
+  const [imgSrc, setImgSrc] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
 
@@ -53,7 +52,7 @@ function App() {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      setImgSrc(placeholderImg);
+      setImgSrc(null);
       setIsAuth(false);
       setUploadResultMessage('Please authenticate with your new photo.');
 
