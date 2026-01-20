@@ -94,7 +94,7 @@ function App() {
   // Toggle camera
   const toggleCamera = () => {
     if (!cameraActive) {
-      setImgSrc(placeholderImg);
+      setImgSrc(null);
       setUploadResultMessage('Please upload an image to authenticate.');
       setIsAuth(false);
     }
@@ -229,17 +229,19 @@ function App() {
         {uploadResultMessage}
       </div>
 
-      <img
-        src={imgSrc}
-        alt="User"
-        className="preview-image"
-        style={{
-          height: '250px',
-          width: 'auto',
-          maxWidth: '100%',
-          objectFit: 'contain',
-        }}
-      />
+      {imgSrc && (
+        <img
+          src={imgSrc}
+          alt="User"
+          className="preview-image"
+          style={{
+            height: '250px',
+            width: 'auto',
+            maxWidth: '100%',
+            objectFit: 'contain',
+          }}
+        />
+      )}
     </div>
   );
 }
