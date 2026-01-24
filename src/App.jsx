@@ -1,7 +1,7 @@
 import './App.css';
 import { useState, useRef, useEffect } from 'react';
 import * as uuid from 'uuid';
-import placeholderImg from './asset/placeholder.png';
+import { MdPhotoCamera, MdClose } from 'react-icons/md';
 
 function App() {
   const videoRef = useRef(null);
@@ -11,7 +11,7 @@ function App() {
   const [uploadResultMessage, setUploadResultMessage] = useState(
     'Please upload an image to authenticate.'
   );
-  const [imgSrc, setImgSrc] = useState(placeholderImg);
+  const [imgSrc, setImgSrc] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
 
@@ -53,7 +53,7 @@ function App() {
       const video = videoRef.current;
       const canvas = canvasRef.current;
 
-      setImgSrc(placeholderImg);
+      setImgSrc(null);
       setIsAuth(false);
       setUploadResultMessage('Please authenticate with your new photo.');
 
@@ -95,11 +95,20 @@ function App() {
   // Toggle camera
   const toggleCamera = () => {
     if (!cameraActive) {
-      setImgSrc(placeholderImg);
+      setImgSrc(null);
       setUploadResultMessage('Please upload an image to authenticate.');
       setIsAuth(false);
     }
     setCameraActive(!cameraActive);
+  };
+
+  // Try again - reset and go back to capturing
+  const tryAgain = () => {
+    setImage(null);
+    setImgSrc(null);
+    setIsAuth(false);
+    setUploadResultMessage('Please upload an image to authenticate.');
+    setCameraActive(true);
   };
 
   const sendImage = async (e) => {
@@ -197,50 +206,65 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <h2>Facial Recognition Attendance System</h2>
+    /* UI wrapper for gradient background */
+    <div className="app-bg">
+      {/* Main card container */}
+      <div className="App">
+        <h2>Facial Recognition Attendance System</h2>
 
-      <button type="button" onClick={toggleCamera}>
-        {cameraActive ? 'Turn Off Camera' : 'Use Camera'}
-      </button>
+        <div className={isAuth ? 'success' : 'failure'}>
+          {uploadResultMessage}
+        </div>
 
-      {cameraActive && (
-        <div className="camera-container">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            style={{ width: '100%', maxWidth: '500px' }}
-          />
-          <button type="button" onClick={capturePhoto}>
-            Take Photo
+        {/* Camera frame */}
+        <div className="camera-frame">
+          {cameraActive && (
+            <>
+              <video ref={videoRef} autoPlay playsInline />
+              <div className="button-group">
+                <button type="button" onClick={capturePhoto} className="icon-btn">
+                  <MdPhotoCamera />
+                </button>
+                <button type="button" onClick={toggleCamera} className="icon-btn secondary-btn">
+                  <MdClose />
+                </button>
+              </div>
+            </>
+          )}
+
+          {!cameraActive && !imgSrc && (
+            <>
+              <p className="camera-hint">
+                This application requires a camera to work.
+              </p>
+              <button type="button" onClick={toggleCamera}>
+                Turn On Camera
+              </button>
+            </>
+          )}
+
+          {imgSrc && !cameraActive && (
+            <>
+              <img
+                src={imgSrc}
+                alt="User"
+                className="preview-image"
+              />
+              <button type="button" onClick={tryAgain} className="secondary-btn">
+                Try Again
+              </button>
+            </>
+          )}
+        </div>
+
+        <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+        <div className="auth-button-container">
+          <button onClick={sendImage} disabled={!image || cameraActive}>
+            Authenticate
           </button>
         </div>
-      )}
-
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-      <div className="auth-button-container">
-        <button onClick={sendImage} disabled={!image || cameraActive}>
-          Authenticate
-        </button>
       </div>
-
-      <div className={isAuth ? 'success' : 'failure'}>
-        {uploadResultMessage}
-      </div>
-
-      <img
-        src={imgSrc}
-        alt="User"
-        className="preview-image"
-        style={{
-          height: '250px',
-          width: 'auto',
-          maxWidth: '100%',
-          objectFit: 'contain',
-        }}
-      />
     </div>
   );
 }
