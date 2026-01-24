@@ -1,6 +1,7 @@
 import './App.css';
 import { useState, useRef, useEffect } from 'react';
 import * as uuid from 'uuid';
+import { MdPhotoCamera, MdClose } from 'react-icons/md';
 
 function App() {
   const videoRef = useRef(null);
@@ -220,12 +221,14 @@ function App() {
           {cameraActive && (
             <>
               <video ref={videoRef} autoPlay playsInline />
-              <button type="button" onClick={capturePhoto}>
-                Take Photo
-              </button>
-              <button type="button" onClick={toggleCamera} className="secondary-btn">
-                Turn Off Camera
-              </button>
+              <div className="button-group">
+                <button type="button" onClick={capturePhoto} className="icon-btn">
+                  <MdPhotoCamera />
+                </button>
+                <button type="button" onClick={toggleCamera} className="icon-btn secondary-btn">
+                  <MdClose />
+                </button>
+              </div>
             </>
           )}
 

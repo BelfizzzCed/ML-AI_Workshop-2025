@@ -84,6 +84,50 @@ h2 {
   bottom: 80px;
 }
 
+/* Button group for side-by-side icons */
+.button-group {
+  position: absolute;
+  bottom: 20px;
+  display: flex;
+  gap: 16px;
+  z-index: 10;
+}
+
+/* Icon button styling */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  background-color: #3489d3;
+  color: #ffffff;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.icon-btn:hover {
+  background-color: #3489d3b0;
+  box-shadow: 0 12px 24px #3489d3b0;
+}
+
+.icon-btn:active {
+  transform: scale(0.98);
+}
+
+.icon-btn.secondary-btn {
+  background-color: #ef4444;
+}
+
+.icon-btn.secondary-btn:hover {
+  background-color: #dc2626;
+  box-shadow: 0 12px 24px #dc2626b0;
+}
+
 .secondary-btn {
   background-color: #ef4444 !important;
 }
