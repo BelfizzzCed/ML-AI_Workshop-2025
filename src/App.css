@@ -91,13 +91,13 @@ button {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
-  background-color: #8b5cf6;
+  background-color: #3489d3;
   color: #ffffff;
 }
 
 button:hover {
-  background-color: #7c3aed;
-  box-shadow: 0 12px 24px rgba(139, 92, 246, 0.35);
+  background-color: #3489d3b0;
+  box-shadow: 0 12px 24px #3489d3b0;
 }
 
 button:active {
@@ -116,12 +116,11 @@ button:active {
 /* ---------- Status messages ---------- */
 .success,
 .failure {
-  margin-top: 2px;
-  padding: 14px 18px;
+  padding: 13px 16px;
   border-radius: 12px;
   font-weight: 600;
   width: 100%;
-  max-width: 420px;
+  max-width: 600px;
   
 }
 
