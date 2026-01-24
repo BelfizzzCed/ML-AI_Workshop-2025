@@ -196,52 +196,55 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <h2>Facial Recognition Attendance System</h2>
+    /* UI wrapper for gradient background */
+    <div className="app-bg">
+      {/* Main card container */}
+      <div className="App">
+        <h2>Facial Recognition Attendance System</h2>
 
-      <button type="button" onClick={toggleCamera}>
-        {cameraActive ? 'Turn Off Camera' : 'Use Camera'}
-      </button>
+        <div className={isAuth ? 'success' : 'failure'}>
+          {uploadResultMessage}
+        </div>
 
-      {cameraActive && (
-        <div className="camera-container">
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            style={{ width: '100%', maxWidth: '500px' }}
-          />
-          <button type="button" onClick={capturePhoto}>
-            Take Photo
+        {/* Camera frame */}
+        <div className="camera-frame">
+          {cameraActive && (
+            <>
+              <video ref={videoRef} autoPlay playsInline />
+              <button type="button" onClick={capturePhoto}>
+                Take Photo
+              </button>
+            </>
+          )}
+
+          {!cameraActive && !imgSrc && (
+            <>
+              <p className="camera-hint">
+                This application requires a camera to work.
+              </p>
+              <button type="button" onClick={toggleCamera}>
+                Turn On Camera
+              </button>
+            </>
+          )}
+
+          {imgSrc && !cameraActive && (
+            <img
+              src={imgSrc}
+              alt="User"
+              className="preview-image"
+            />
+          )}
+        </div>
+
+        <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+        <div className="auth-button-container">
+          <button onClick={sendImage} disabled={!image || cameraActive}>
+            Authenticate
           </button>
         </div>
-      )}
-
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-      <div className="auth-button-container">
-        <button onClick={sendImage} disabled={!image || cameraActive}>
-          Authenticate
-        </button>
       </div>
-
-      <div className={isAuth ? 'success' : 'failure'}>
-        {uploadResultMessage}
-      </div>
-
-      {imgSrc && (
-        <img
-          src={imgSrc}
-          alt="User"
-          className="preview-image"
-          style={{
-            height: '250px',
-            width: 'auto',
-            maxWidth: '100%',
-            objectFit: 'contain',
-          }}
-        />
-      )}
     </div>
   );
 }

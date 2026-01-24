@@ -3,10 +3,15 @@ body {
   min-height: 100vh;
   margin: 0;
   font-family: 'Inter', 'Roboto', sans-serif;
-  background: linear-gradient(120deg, #f7b2e6 0%, #a0e9ff 100%);
+}
+
+/* Gradient wrapper */
+.app-bg {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(120deg, #f7b2e6 0%, #a0e9ff 100%);
 }
 
 /* container */
@@ -14,71 +19,71 @@ body {
   background-color: #ffffff;
   color: #1f2937;
 
-  width: 960px;
-  max-width: 92vw;
-  height: 620px;
+  width: 900px;
+  max-width: 90vw;
 
-  padding: 36px;
+  padding: 50px;
   border-radius: 24px;
+  border: 3px solid #e9c6ff;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
 
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  overflow: hidden; 
-  gap: 20px;
+  gap: 30px;
 }
 
-/* Switch to grid when camera is active */
-.App:has(.camera-container) {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  grid-template-rows: auto auto 1fr auto;
-  column-gap: 60px;
-  align-items: start;
-  gap: 0;
-}
-
+/* Title */
 h2 {
   font-size: 2.1rem;
   font-weight: 700;
-  margin: 0 0 10px 0;
+  margin: 0;
   color: #374151;
-  order: 1;
 }
 
-.App:has(.camera-container) h2 {
-  grid-column: 1 / -1;
-}
-
-/* container */
-.camera-container {
+/* Camera frame */
+.camera-frame {
   width: 100%;
-  max-width: 880px;
-  max-height: 540px;
+  max-width: 640px;
+  height: 320px;
+
+  background: #fafafa;
+  border-radius: 16px;
+  border: 2px solid #d1d5db;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-self: center;
-  margin-top: 26px;
-  grid-column: 1 / -1;
-  grid-row: 3;
-  border-width: 2px;
+  justify-content: center;
+  gap: 16px;
 }
 
 /* Camera video */
-.camera-container video {
+.camera-frame video {
   width: 100%;
-  max-height: 800px;
-  border-radius: 26px;
+  height: 100%;
   object-fit: cover;
-  margin-bottom: 12px;
-  aspect-ratio: 16 / 9;
+  border-radius: 14px;
 }
 
+/* Preview image */
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 14px;
+}
+
+/* Camera hint text */
+.camera-hint {
+  color: #6b7280;
+}
+
+/* Buttons */
 button {
-  padding: 15px 30px;
+  padding: 12px 24px;
   border-radius: 9999px;
   border: none;
   font-family: inherit;
@@ -86,62 +91,20 @@ button {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.25s ease;
-  background-color: #3489d3;
+  background-color: #8b5cf6;
   color: #ffffff;
-  order: 4;
 }
 
 button:hover {
-  background-color: #3489d3b0;
-  box-shadow: 0 12px 24px #3489d3b0;
+  background-color: #7c3aed;
+  box-shadow: 0 12px 24px rgba(139, 92, 246, 0.35);
 }
 
 button:active {
   transform: scale(0.98);
 }
 
-.camera-container button {
-  background-color: #3489d3;
-}
-
-.camera-container button:hover {
-  background-color: #3489d3b0;
-}
-
-.success,
-.failure {
-  width: 100%;
-}
-
-.auth-button-container {
-  width: auto;
-}
-
-
-.App:has(.camera-container) .auth-button-container {
-  grid-column: 2 / 3;
-  grid-row: 4;
-  justify-self: start;
-  max-width: 220px;
-}
-
-.auth-button-container {
-  margin-top: 0;
-  order: 4;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  
-}
-
-.App:has(.camera-container) .auth-button-container {
-  align-self: center;
-  order: auto;
-  margin-top: 0;
-  gap: 0;
-  margin-left: 24px;
-}
-
+/* Auth button container */
 .auth-button-container button:disabled {
   background-color: #d1d5db;
   color: #6b7280;
@@ -153,64 +116,25 @@ button:active {
 /* ---------- Status messages ---------- */
 .success,
 .failure {
-  margin: 10px 0;
+  margin-top: 2px;
   padding: 14px 18px;
   border-radius: 12px;
   font-weight: 600;
-  order: 3;
   width: 100%;
-}
-
-.App:has(.camera-container) .success,
-.App:has(.camera-container) .failure {
-  margin: 12px 0 16px 0;
-  padding: 14px 18px;
-  order: auto;
-  grid-column: 1 / -1;
-  grid-row: 2;
-  width: auto;
-  max-width: 360px; 
-  justify-self: center;
-  text-align: center;
-}
-
-.App:has(.camera-container) > button[type='button'] {
-  grid-column: 1 / 2;
-  grid-row: 4;
-  justify-self: end;
-  max-width: 220px;
-  width: 100%;
-}
-
-.App:has(.camera-container) .auth-button-container button {
-  width: 100%;
-  max-width: 220px;
+  max-width: 420px;
+  
 }
 
 .success {
   background-color: rgba(34, 197, 94, 0.15);
-  color:#065f46;
+  color: #065f46;
   border-left: 5px solid #22c55e;
+
 }
 
 .failure {
   background-color: rgba(239, 68, 68, 0.15);
   color: #7f1d1d;
   border-left: 5px solid #ef4444;
-}
 
-.preview-image {
-  max-height: 260px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-  border-radius: 16px;
-  border: 2px solid #e5e7eb;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-  order: 2;
-  margin: 10px 0;
-}
-
-.camera-container ~ .preview-image {
-  display: none;
 }
