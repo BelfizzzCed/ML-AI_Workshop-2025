@@ -101,6 +101,15 @@ function App() {
     setCameraActive(!cameraActive);
   };
 
+  // Try again - reset and go back to capturing
+  const tryAgain = () => {
+    setImage(null);
+    setImgSrc(null);
+    setIsAuth(false);
+    setUploadResultMessage('Please upload an image to authenticate.');
+    setCameraActive(true);
+  };
+
   const sendImage = async (e) => {
     e.preventDefault();
 
@@ -214,6 +223,9 @@ function App() {
               <button type="button" onClick={capturePhoto}>
                 Take Photo
               </button>
+              <button type="button" onClick={toggleCamera} className="secondary-btn">
+                Turn Off Camera
+              </button>
             </>
           )}
 
@@ -229,11 +241,16 @@ function App() {
           )}
 
           {imgSrc && !cameraActive && (
-            <img
-              src={imgSrc}
-              alt="User"
-              className="preview-image"
-            />
+            <>
+              <img
+                src={imgSrc}
+                alt="User"
+                className="preview-image"
+              />
+              <button type="button" onClick={tryAgain} className="secondary-btn">
+                Try Again
+              </button>
+            </>
           )}
         </div>
 
