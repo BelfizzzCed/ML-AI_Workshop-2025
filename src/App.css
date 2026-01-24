@@ -190,7 +190,7 @@ button:active {
   transform: none;
 }
 
-/* ---------- Status messages ---------- */
+/*  Status messages  */
 .success,
 .failure {
   padding: 12px 14px;
