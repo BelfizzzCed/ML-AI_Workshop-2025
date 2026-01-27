@@ -96,7 +96,7 @@ function App() {
   const toggleCamera = () => {
     if (!cameraActive) {
       setImgSrc(null);
-      setUploadResultMessage('Please upload an image to authenticate.');
+      setUploadResultMessage('Note: Make sure to upload a photo to bucket beforehand.');
       setIsAuth(false);
     }
     setCameraActive(!cameraActive);
@@ -107,7 +107,7 @@ function App() {
     setImage(null);
     setImgSrc(null);
     setIsAuth(false);
-    setUploadResultMessage('Please upload an image to authenticate.');
+    setUploadResultMessage('Please take a photo to authenticate.');
     setCameraActive(true);
   };
 
